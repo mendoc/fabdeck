@@ -1,0 +1,22 @@
+{
+  "name": "fabdeck",
+  "version": "1.0.0",
+  "description": "Plateforme d'interaction avec un deck physique de boutons",
+  "main": "index.js",
+  "scripts": {
+    "serve": "netlify-lambda serve funcs -c webpack.functions.js",
+    "build": "netlify-lambda build funcs -c webpack.functions.js"
+  },
+  "repository": "https://github.com/mendoc/fabdeck.git",
+  "author": "Dimitri ONGOUA <ongouadimitri5@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "axios": "^0.27.2"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.1",
+    "netlify-lambda": "^2.0.15",
+    "webpack-node-externals": "^3.0.0"
+  }
+}
