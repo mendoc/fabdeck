@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fabdeck - Administration</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="column">
+                <h1>Fabdeck</h1>
+            </div>
+        </div>
+        <form>
+            <div class="row">
+                <div class="column">
+                    <label for="slc-event">Evènement</label>
+                    <select id="slc-event">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+                <div class="column">
+                    <label for="slc-action">Action</label>
+                    <select id="slc-action">
+                        <option>--- Choisissez une action ---</option>
+                        <option value="url">Exécuter une URL</option>
+                        <option value="email">Envoyer un e-mail</option>
+                        <option value="tlg">Envoyer un message Telegram</option>
+                        <optgroup label="Ordinateur">
+                            <option value="web">Ouvrir le navigateur</option>
+                            <option value="cmd">Exécuter une commande</option>
+                        </optgroup>
+                        <optgroup label="Smartphone">
+                            <option value="sms">Envoyer un SMS</option>
+                            <option value="notif">Envoyer une notifcation</option>
+                        </optgroup>
+                        <optgroup label="Domotique">
+                            <option value="lamp">Allumer/Eteindre une lampe</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+            <hr>
+            <div class="row" id="blc-params"></div>
+            <hr>
+            <div class="row">
+                <div class="column">
+                    <input class="button-primary" type="submit" value="Enregistrer">
+                </div>
+            </div>
+        </form>
+        <template id="tpl-url">
+            <div class="column">
+                <label for="ch-url">URL à exécuter</label>
+                <input type="url" placeholder="Ex: https://exemple.com/ressource..." id="ch-url">
+            </div>
+        </template>
+        <template id="tpl-web">
+            <div class="column">
+                <label for="ch-adr">Page à ouvrir</label>
+                <input type="url" placeholder="Ex: https://google.com" id="ch-adr">
+            </div>
+        </template>
+        <template id="tpl-cmd">
+            <div class="column">
+                <label for="ch-cmd">Commande à exécuter</label>
+                <input type="text" placeholder="Ex: start calc" id="ch-cmd">
+            </div>
+        </template>
+        <template id="tpl-email">
+            <div class="column">
+                <label for="ch-dest">Destinataire :</label>
+                <input type="email" placeholder="destinataire@gmail.com" id="ch-dest">
+                <label for="ch-obj">Objet :</label>
+                <input type="text" placeholder="Salutations" id="ch-obj">
+                <label for="ch-msg">Message :</label>
+                <textarea placeholder="Message à envoyer" id="ch-msg"></textarea>
+            </div>
+        </template>
+        <template id="tpl-lamp">
+            <div class="column">
+                <label for="ch-allum">URL pour allumer :</label>
+                <input type="url" placeholder="https://lamp.com?cmd=ON" id="ch-allum">
+                <label for="ch-etein">URL pour éteindre :</label>
+                <input type="url" placeholder="https://lamp.com?cmd=OFF" id="ch-etein">
+            </div>
+        </template>
+        <template id="tpl-sms">
+            <div class="column">
+                <label for="ch-tel">Numéro de téléphone :</label>
+                <input type="tel" placeholder="+24174665544" id="ch-tel">
+                <label for="ch-sms">Message :</label>
+                <textarea placeholder="Message à envoyer" id="ch-sms"></textarea>
+            </div>
+        </template>
+        <template id="tpl-notif">
+            <div class="column">
+                <label for="ch-notif">Notification :</label>
+                <textarea placeholder="Notification à envoyer" id="ch-notif"></textarea>
+            </div>
+        </template>
+        <template id="tpl-tlg">
+            <div class="column">
+                <label for="ch-tlg">Message à envoyer :</label>
+                <textarea placeholder="Ex: Nous avons une visite..." id="ch-tlg"></textarea>
+            </div>
+        </template>
+    </div>
+
+
+    <script>
+        let paramsEl = el("#blc-params")
+        let actionEl = el("#slc-action")
+        actionEl.on("change", () => {
+            const tplEl = el(`#tpl-${actionEl.value}`)
+            if (tplEl) {
+                paramsEl.innerHTML = tplEl.innerHTML
+            } else {
+                paramsEl.innerHTML = ""
+            }
+        })
+
+        function el(sel) {
+            let e = document.querySelector(sel)
+            if (e) {
+                e.on = (event, cb) => {
+                    e.addEventListener(event, cb)
+                }
+            }
+            return e
+        }
+    </script>
+</body>
+
+</html>
