@@ -24,16 +24,13 @@
                 <div class="column">
                     <label for="slc-event">Evènement</label>
                     <select id="slc-event">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
+                        <option>Pas d'évènement</option>
                     </select>
                 </div>
                 <div class="column">
                     <label for="slc-action">Action</label>
                     <select id="slc-action">
-                        <option>--- Choisissez une action ---</option>
+                        <option value="none">--- Aucune action ---</option>
                         <option value="url">Exécuter une URL</option>
                         <option value="email">Envoyer un e-mail</option>
                         <option value="tlg">Envoyer un message Telegram</option>
@@ -60,86 +57,187 @@
                 </div>
             </div>
         </form>
+
+        <!-- Liste des templates -->
         <template id="tpl-url">
             <div class="column">
                 <label for="ch-url">URL à exécuter</label>
-                <input type="url" placeholder="Ex: https://exemple.com/ressource..." id="ch-url">
+                <input type="url" name="url" placeholder="Ex: https://exemple.com/ressource..." id="ch-url">
             </div>
         </template>
         <template id="tpl-web">
             <div class="column">
                 <label for="ch-adr">Page à ouvrir</label>
-                <input type="url" placeholder="Ex: https://google.com" id="ch-adr">
+                <input type="url" name="adr" placeholder="Ex: https://google.com" id="ch-adr">
             </div>
         </template>
         <template id="tpl-cmd">
             <div class="column">
                 <label for="ch-cmd">Commande à exécuter</label>
-                <input type="text" placeholder="Ex: start calc" id="ch-cmd">
+                <input type="text" name="cmd" placeholder="Ex: start calc" id="ch-cmd">
             </div>
         </template>
         <template id="tpl-email">
             <div class="column">
                 <label for="ch-dest">Destinataire :</label>
-                <input type="email" placeholder="destinataire@gmail.com" id="ch-dest">
+                <input type="email" name="email" placeholder="destinataire@gmail.com" id="ch-dest">
                 <label for="ch-obj">Objet :</label>
-                <input type="text" placeholder="Salutations" id="ch-obj">
+                <input type="text" name="obj" placeholder="Salutations" id="ch-obj">
                 <label for="ch-msg">Message :</label>
-                <textarea placeholder="Message à envoyer" id="ch-msg"></textarea>
+                <textarea name="msg" placeholder="Message à envoyer" id="ch-msg"></textarea>
             </div>
         </template>
         <template id="tpl-lamp">
             <div class="column">
                 <label for="ch-allum">URL pour allumer :</label>
-                <input type="url" placeholder="https://lamp.com?cmd=ON" id="ch-allum">
+                <input type="url" name="on" placeholder="https://lamp.com?cmd=ON" id="ch-allum">
                 <label for="ch-etein">URL pour éteindre :</label>
-                <input type="url" placeholder="https://lamp.com?cmd=OFF" id="ch-etein">
+                <input type="url" name="off" placeholder="https://lamp.com?cmd=OFF" id="ch-etein">
             </div>
         </template>
         <template id="tpl-sms">
             <div class="column">
                 <label for="ch-tel">Numéro de téléphone :</label>
-                <input type="tel" placeholder="+24174665544" id="ch-tel">
+                <input type="tel" name="tel" placeholder="+24174665544" id="ch-tel">
                 <label for="ch-sms">Message :</label>
-                <textarea placeholder="Message à envoyer" id="ch-sms"></textarea>
+                <textarea name="sms" placeholder="Message à envoyer" id="ch-sms"></textarea>
             </div>
         </template>
         <template id="tpl-notif">
             <div class="column">
                 <label for="ch-notif">Notification :</label>
-                <textarea placeholder="Notification à envoyer" id="ch-notif"></textarea>
+                <textarea name="notif" placeholder="Notification à envoyer" id="ch-notif"></textarea>
             </div>
         </template>
         <template id="tpl-tlg">
             <div class="column">
                 <label for="ch-tlg">Message à envoyer :</label>
-                <textarea placeholder="Ex: Nous avons une visite..." id="ch-tlg"></textarea>
+                <textarea name="tlg" placeholder="Ex: Nous avons une visite..." id="ch-tlg"></textarea>
             </div>
         </template>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, getDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.8.1/firebase-firestore.js";
 
-    <script>
-        let paramsEl = el("#blc-params")
-        let actionEl = el("#slc-action")
-        actionEl.on("change", () => {
-            const tplEl = el(`#tpl-${actionEl.value}`)
-            if (tplEl) {
-                paramsEl.innerHTML = tplEl.innerHTML
-            } else {
-                paramsEl.innerHTML = ""
+
+
+        document.addEventListener("DOMContentLoaded", () => {
+            let paramsEl = el("#blc-params")
+            let actionEl = el("#slc-action")
+            let eventEl = el("#slc-event")
+            let formEl = el("form")
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyDr8k_9i34cIIu4FfBYIyi-WhuKe_BAegQ",
+                authDomain: "fab-deck.firebaseapp.com",
+                projectId: "fab-deck",
+                storageBucket: "fab-deck.appspot.com",
+                messagingSenderId: "712593702393",
+                appId: "1:712593702393:web:73dd5b682fddf77c739128"
+            };
+
+            // Initialize Firebase
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+
+            chargerEvents()
+
+            // -------- Evènements --------- //
+            actionEl.on("change", () => {
+                chargerParams(actionEl.value)
+            })
+
+            eventEl.on("change", () => {
+                chargerAction(eventEl.value)
+            })
+
+            formEl.on("submit", (e) => {
+                e.preventDefault()
+                enregAction()
+            })
+
+            // --------- Fonctions --------- //
+            function chargerParams(actionType) {
+                const tplEl = el(`#tpl-${actionType}`)
+                if (tplEl) {
+                    paramsEl.innerHTML = tplEl.innerHTML
+                } else {
+                    paramsEl.innerHTML = ""
+                }
+            }
+
+            function enregAction() {
+                let paramsEls = paramsEl.querySelectorAll("[name]")
+                let params = {}
+                paramsEls.forEach((p) => {
+                    params[p.getAttribute("name")] = p.value
+                })
+                setDoc(doc(db, "actions", eventEl.value), {
+                    type: actionEl.value,
+                    params: params
+                });
+            }
+
+            function chargerEvents() {
+                getDocs(collection(db, "events")).then((snapshot) => {
+                    if (!snapshot.empty) {
+                        eventEl.innerHTML = ""
+                        let firstDocID = null
+                        snapshot.docs.forEach(doc => {
+                            if (firstDocID === null) {
+                                firstDocID = doc.id
+                                chargerAction(firstDocID)
+                            }
+                            eventEl.add(`<option value="${doc.id}">${doc.id}</option>`)
+                        });
+                        chargerAction(firstDocID)
+                    }
+                }).catch((err) => {
+                    console.log("Erreur lors de la reécupération des events:", err);
+                });
+            }
+
+            function chargerAction(enventID) {
+                getDoc(doc(db, "actions", enventID)).then((docSnap) => {
+                    if (docSnap.exists()) {
+                        const act = docSnap.data()
+                        actionEl.value = act.type
+                        chargerParams(actionEl.value)
+                        for (const type in act.params) {
+                            el(`[name="${type}"]`).value = act.params[type]
+                        }
+                    } else {
+                        actionEl.value = "none"
+                        chargerParams(actionEl.value)
+                    }
+                }).catch((err) => {
+                    console.log("Erreur lors de la reécupération de l'action:", err);
+                })
+            }
+
+            function el(sel) {
+                let e = document.querySelector(sel)
+                if (e) {
+                    e.on = (event, cb) => {
+                        e.addEventListener(event, cb)
+                    }
+                    e.add = (childHTML) => {
+                        e.innerHTML += childHTML
+                    }
+                }
+                return e
+            }
+
+            function cl(...data) {
+                console.log(data)
             }
         })
 
-        function el(sel) {
-            let e = document.querySelector(sel)
-            if (e) {
-                e.on = (event, cb) => {
-                    e.addEventListener(event, cb)
-                }
-            }
-            return e
-        }
+
     </script>
 </body>
 
