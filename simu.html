@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fabdeck - Simulateur</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+
+    <style>
+        .bouton {
+            height: 100px;
+            width: 100px;
+            margin: 0 25px;
+            cursor: pointer;
+            transition: height 100ms, margin-top 100ms;
+            color: black;
+            font-weight: bold;
+            font-size: 5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bouton:active {
+            height: 80px;
+            margin-top: 10px;
+        }
+
+        .bleu {
+            background-color: rgb(111, 111, 227);
+        }
+
+        .jaune {
+            background-color: rgb(193, 218, 51);
+        }
+
+        .vert {
+            background-color: rgb(49, 206, 35);
+        }
+
+        .rouge {
+            background-color: rgb(241, 77, 77);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <h1>Fabdeck - Simulateur</h1>
+        </div>
+        <div class="row">
+            <div class="bouton bleu" data-event="1">1</div>
+            <div class="bouton jaune" data-event="2">2</div>
+            <div class="bouton vert" data-event="3">3</div>
+            <div class="bouton rouge" data-event="4">4</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const url = "https://fabdeck.netlify.app/.netlify/functions/routeur?e=EVENT"
+            document.querySelectorAll(".bouton").forEach((b) => {
+                b.addEventListener("click", () => {
+                    const evt = b.dataset.event
+                    fetch(url.replace("EVENT", evt)).then((r) => {
+                        console.log(r)
+                    }).catch(console.log)
+                })
+            })
+        })
+    </script>
+</body>
+
+</html>
