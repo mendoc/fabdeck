@@ -27,6 +27,9 @@ exports.handler = async (e, context) => {
                     case "tlg":
                         sendTelegramMessage(action.params.tlg, action.params.chatid)
                         break;
+                    case "url":
+                        goToURL(action.params.url)
+                        break;
                 }
             }
         }
@@ -73,6 +76,9 @@ async function sendTelegramMessage(msg, chatID) {
     msg = msg.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
     const url = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + chatID + '&parse_mode=Markdown&text=' + msg
-    const res = await axios.get(url).catch(console.log);
-    console.log(res.data.ok)
+    await axios.get(url).catch(console.log);
+}
+
+async function goToURL(url) {
+    await axios.get(url).catch(console.log);
 }
