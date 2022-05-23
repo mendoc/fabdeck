@@ -1,5 +1,5 @@
 require('dotenv').config();
-
+const axios = require('axios')
 const admin = require('firebase-admin');
 
 const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT);
@@ -9,7 +9,6 @@ admin.initializeApp({
     databaseURL: process.env.DATABASE_URL
 });
 
-
 const db = admin.firestore();
 
 exports.handler = async (e, context) => {
@@ -17,6 +16,20 @@ exports.handler = async (e, context) => {
 
     if (evt) {
         const err = await updateEvent(evt)
+
+        if (err === false) {
+            // On récupère l'action de l'event
+            const action = await getAction(evt)
+
+            if (action) {
+                console.log(action)
+                switch (action.type) {
+                    case "tlg":
+                        sendTelegramMessage(action.params.tlg, action.params.chatid)
+                        break;
+                }
+            }
+        }
         return {
             statusCode: 200,
             headers: { "Content-Type": "application/json" },
@@ -31,7 +44,7 @@ exports.handler = async (e, context) => {
     }
 }
 
-async function updateEvent(evt, cb) {
+async function updateEvent(evt) {
     const evtDoc = {
         targetAt: admin.firestore.FieldValue.serverTimestamp(),
     }
@@ -43,4 +56,23 @@ async function updateEvent(evt, cb) {
         console.log(err)
         return true
     }
+}
+
+async function getAction(evt) {
+    try {
+        const snap = await db.collection("actions").doc(evt).get();
+        return snap.data()
+    } catch (err) {
+        console.log(err)
+        return true
+    }
+}
+
+async function sendTelegramMessage(msg, chatID) {
+    const bot_token = process.env.BOT_TOKEN
+    msg = msg.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+    const url = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + chatID + '&parse_mode=Markdown&text=' + msg
+    const res = await axios.get(url).catch(console.log);
+    console.log(res.data.ok)
 }
