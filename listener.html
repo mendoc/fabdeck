@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fabdeck - Listener</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <h1>Fabdeck - Listener</h1>
+        </div>
+        <p>Ecoute des pings depuis le Fabdeck</p>
+        <div class="row">
+            <table>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, getDoc, onSnapshot, doc } from "https://www.gstatic.com/firebasejs/9.8.1/firebase-firestore.js";
+
+
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const firebaseConfig = {
+                apiKey: "AIzaSyDr8k_9i34cIIu4FfBYIyi-WhuKe_BAegQ",
+                authDomain: "fab-deck.firebaseapp.com",
+                projectId: "fab-deck",
+                storageBucket: "fab-deck.appspot.com",
+                messagingSenderId: "712593702393",
+                appId: "1:712593702393:web:73dd5b682fddf77c739128"
+            };
+
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+
+            // Ecoute du document event id=5
+            const unsub = onSnapshot(doc(db, "events", "5"), (doc) => {
+                if (document.querySelectorAll('tr').length === 10) el("tbody").innerHTML = ""
+                const d = doc.data();
+                el("tbody").add(`<tr><td>${d.targetAt.toDate().toLocaleString()}</td></tr>`)
+            });
+
+            // Fonctions
+            function el(sel) {
+                let e = document.querySelector(sel)
+                if (e) {
+                    e.on = (event, cb) => {
+                        e.addEventListener(event, cb)
+                    }
+                    e.add = (childHTML) => {
+                        e.innerHTML += childHTML
+                    }
+                }
+                return e
+            }
+        })
+    </script>
+</body>
+
+</html>
